@@ -15,6 +15,21 @@ defmodule Blog.PostsTest do
       assert Posts.list_posts() == [post]
     end
 
+    test "list_posts/1 returns all posts" do
+      found = post_fixture(title: "aaa")
+      partial_match_beginning = post_fixture(title: "aaab")
+      partial_match_end = post_fixture(title: "baaa")
+      case_insensitive_match = post_fixture(title: "AAA")
+      not_found = post_fixture(title: "bbb")
+
+      assert Posts.list_posts(title: "aaa") == [
+               found,
+               partial_match_beginning,
+               partial_match_end,
+               case_insensitive_match
+             ]
+    end
+
     test "get_post!/1 returns the post with given id" do
       post = post_fixture()
       assert Posts.get_post!(post.id) == post

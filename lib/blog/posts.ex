@@ -21,6 +21,15 @@ defmodule Blog.Posts do
     Repo.all(Post)
   end
 
+  def list_posts(filters) do
+    title_filter = Keyword.get(filters, :title)
+    search = "%#{title_filter}%"
+
+    Post
+    |> where([p], ilike(p.title, ^search))
+    |> Repo.all()
+  end
+
   @doc """
   Gets a single post.
 
