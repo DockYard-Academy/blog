@@ -22,12 +22,30 @@ defmodule Blog.Posts do
   end
 
   def list_posts(filters) do
-    title_filter = Keyword.get(filters, :title)
-    search = "%#{title_filter}%"
+    title_filter = Keyword.get(filters, :title, "")
+    content_filter = Keyword.get(filters, :content, "")
+    title_search = "%#{title_filter}%"
+    content_search = "%#{content_filter}%"
 
-    Post
-    |> where([p], ilike(p.title, ^search))
-    |> Repo.all()
+    query =
+      case {title_filter, content_filter} do
+        {"", ""} ->
+          Post
+
+        {"", _} ->
+          Post
+          |> where([p], ilike(p.content, ^content_search))
+
+        {_, ""} ->
+          Post
+          |> where([p], ilike(p.title, ^title_search))
+
+        {_, _} ->
+          Post
+          |> where([p], ilike(p.title, ^title_search) or ilike(p.content, ^content_search))
+      end
+
+    Repo.all(query)
   end
 
   @doc """

@@ -19,15 +19,17 @@ defmodule BlogWeb.PostControllerTest do
 
     test "lists all posts by search", %{conn: conn} do
       found = post_fixture(title: "aaa")
+      found_by_content = post_fixture(title: "bbb", content: "aaa")
       partial_match_beginning = post_fixture(title: "aaab")
       partial_match_end = post_fixture(title: "baaa")
       case_insensitive_match = post_fixture(title: "AAA")
-      not_found = post_fixture(title: "bbb")
+      not_found = post_fixture(title: "not_found", content: "not_found")
 
-      conn = get(conn, Routes.post_path(conn, :index, title: "aaa"))
+      conn = get(conn, Routes.post_path(conn, :index, search: "aaa"))
       response = html_response(conn, 200)
 
       assert response =~ found.title
+      assert response =~ found_by_content.title
       assert response =~ partial_match_beginning.title
       assert response =~ partial_match_end.title
       assert response =~ case_insensitive_match.title

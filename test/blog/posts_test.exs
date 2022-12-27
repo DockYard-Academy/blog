@@ -15,7 +15,7 @@ defmodule Blog.PostsTest do
       assert Posts.list_posts() == [post]
     end
 
-    test "list_posts/1 returns all posts" do
+    test "list_posts/1 filters posts by title" do
       found = post_fixture(title: "aaa")
       partial_match_beginning = post_fixture(title: "aaab")
       partial_match_end = post_fixture(title: "baaa")
@@ -27,6 +27,39 @@ defmodule Blog.PostsTest do
                partial_match_beginning,
                partial_match_end,
                case_insensitive_match
+             ]
+    end
+
+    test "list_posts/1 filters posts by content" do
+      found = post_fixture(content: "aaa")
+      partial_match_beginning = post_fixture(content: "aaab")
+      partial_match_end = post_fixture(content: "baaa")
+      case_insensitive_match = post_fixture(content: "AAA")
+      not_found = post_fixture(content: "bbb")
+
+      assert Posts.list_posts(content: "aaa") == [
+               found,
+               partial_match_beginning,
+               partial_match_end,
+               case_insensitive_match
+             ]
+    end
+
+    test "lists_posts/1 returns all posts for empty filters" do
+      found = post_fixture(title: "aaa", content: "aaa")
+      assert Posts.list_posts(title: "", content: "") == [found]
+    end
+
+    test "lists_posts/1 filters posts by all filters" do
+      found = post_fixture(title: "aaa", content: "aaa")
+      found_by_title = post_fixture(title: "aaa", content: "not_found")
+      found_by_content = post_fixture(title: "not_found", content: "aaa")
+      not_found = post_fixture(title: "not_found", content: "not_found")
+
+      assert Posts.list_posts(title: "aaa", content: "aaa") == [
+               found,
+               found_by_title,
+               found_by_content
              ]
     end
 
