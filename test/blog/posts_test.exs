@@ -33,9 +33,23 @@ defmodule Blog.PostsTest do
       assert {:error, %Ecto.Changeset{}} = Posts.create_post(@invalid_attrs)
     end
 
+    test "create_post/1 with too-large title and subtitle returns error changeset" do
+      too_long_string = Enum.map(1..101, fn _ -> "a" end) |> Enum.join("")
+      attrs = %{content: nil, subtitle: too_long_string, title: too_long_string}
+
+      assert {:error, %Ecto.Changeset{errors: errors}} = Posts.create_post(attrs)
+      assert Keyword.get(errors, :subtitle)
+      assert Keyword.get(errors, :title)
+    end
+
     test "update_post/2 with valid data updates the post" do
       post = post_fixture()
-      update_attrs = %{content: "some updated content", subtitle: "some updated subtitle", title: "some updated title"}
+
+      update_attrs = %{
+        content: "some updated content",
+        subtitle: "some updated subtitle",
+        title: "some updated title"
+      }
 
       assert {:ok, %Post{} = post} = Posts.update_post(post, update_attrs)
       assert post.content == "some updated content"

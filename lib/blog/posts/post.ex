@@ -15,5 +15,7 @@ defmodule Blog.Posts.Post do
     post
     |> cast(attrs, [:title, :subtitle, :content])
     |> validate_required([:title, :subtitle, :content])
+    |> validate_length(:title, min: 3, max: 100)
+    |> validate_length(:subtitle, min: 3, max: 100)
   end
 end
