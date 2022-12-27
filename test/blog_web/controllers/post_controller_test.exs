@@ -4,13 +4,34 @@ defmodule BlogWeb.PostControllerTest do
   import Blog.PostsFixtures
 
   @create_attrs %{content: "some content", subtitle: "some subtitle", title: "some title"}
-  @update_attrs %{content: "some updated content", subtitle: "some updated subtitle", title: "some updated title"}
+  @update_attrs %{
+    content: "some updated content",
+    subtitle: "some updated subtitle",
+    title: "some updated title"
+  }
   @invalid_attrs %{content: nil, subtitle: nil, title: nil}
 
   describe "index" do
     test "lists all posts", %{conn: conn} do
       conn = get(conn, Routes.post_path(conn, :index))
       assert html_response(conn, 200) =~ "Listing Posts"
+    end
+
+    test "lists all posts by search", %{conn: conn} do
+      found = post_fixture(title: "aaa")
+      partial_match_beginning = post_fixture(title: "aaab")
+      partial_match_end = post_fixture(title: "baaa")
+      case_insensitive_match = post_fixture(title: "AAA")
+      not_found = post_fixture(title: "bbb")
+
+      conn = get(conn, Routes.post_path(conn, :index, title: "aaa"))
+      response = html_response(conn, 200)
+
+      assert response =~ found.title
+      assert response =~ partial_match_beginning.title
+      assert response =~ partial_match_end.title
+      assert response =~ case_insensitive_match.title
+      refute response =~ not_found.title
     end
   end
 

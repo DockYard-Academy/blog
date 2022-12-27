@@ -4,6 +4,11 @@ defmodule BlogWeb.PostController do
   alias Blog.Posts
   alias Blog.Posts.Post
 
+  def index(conn, %{"title" => title}) do
+    posts = Posts.list_posts(title: title)
+    render(conn, "index.html", posts: posts)
+  end
+
   def index(conn, _params) do
     posts = Posts.list_posts()
     render(conn, "index.html", posts: posts)
