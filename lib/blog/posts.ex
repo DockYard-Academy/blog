@@ -22,30 +22,20 @@ defmodule Blog.Posts do
   end
 
   def list_posts(filters) do
-    title_filter = Keyword.get(filters, :title, "")
-    content_filter = Keyword.get(filters, :content, "")
-    title_search = "%#{title_filter}%"
-    content_search = "%#{content_filter}%"
+    Post
+    |> apply_filters(filters)
+    |> Repo.all()
+  end
 
-    query =
-      case {title_filter, content_filter} do
-        {"", ""} ->
-          Post
+  defp apply_filters(initial_query, filters) do
+    Enum.reduce(filters, initial_query, fn
+      {_, ""}, query ->
+        query
 
-        {"", _} ->
-          Post
-          |> where([p], ilike(p.content, ^content_search))
-
-        {_, ""} ->
-          Post
-          |> where([p], ilike(p.title, ^title_search))
-
-        {_, _} ->
-          Post
-          |> where([p], ilike(p.title, ^title_search) or ilike(p.content, ^content_search))
-      end
-
-    Repo.all(query)
+      {field_name, value}, query ->
+        wildcard_value = "%#{value}%"
+        or_where(query, [post], post |> field(^field_name) |> ilike(^wildcard_value))
+    end)
   end
 
   @doc """

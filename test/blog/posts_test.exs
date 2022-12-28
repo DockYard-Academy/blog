@@ -22,12 +22,13 @@ defmodule Blog.PostsTest do
       case_insensitive_match = post_fixture(title: "AAA")
       not_found = post_fixture(title: "bbb")
 
-      assert Posts.list_posts(title: "aaa") == [
-               found,
-               partial_match_beginning,
-               partial_match_end,
-               case_insensitive_match
-             ]
+      results = Posts.list_posts(title: "aaa")
+
+      assert found in results
+      assert partial_match_beginning in results
+      assert partial_match_end in results
+      assert case_insensitive_match in results
+      refute not_found in results
     end
 
     test "list_posts/1 filters posts by content" do
@@ -37,12 +38,13 @@ defmodule Blog.PostsTest do
       case_insensitive_match = post_fixture(content: "AAA")
       not_found = post_fixture(content: "bbb")
 
-      assert Posts.list_posts(content: "aaa") == [
-               found,
-               partial_match_beginning,
-               partial_match_end,
-               case_insensitive_match
-             ]
+      results = Posts.list_posts(content: "aaa")
+
+      assert found in results
+      assert partial_match_beginning in results
+      assert partial_match_end in results
+      assert case_insensitive_match in results
+      refute not_found in results
     end
 
     test "lists_posts/1 returns all posts for empty filters" do
